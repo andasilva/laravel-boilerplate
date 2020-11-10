@@ -1,0 +1,14 @@
+Dockerfile
+docker-compose.yml
+README.md
+.idea
+.gitignore
+.gitattributes
+.env.example
+.editorconfig
+vendor
+node_modules
+nginx
+.idea
+package-lock.json
+phpunit.xml

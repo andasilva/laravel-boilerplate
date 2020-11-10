@@ -1,0 +1,60 @@
+version: "3.7"
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: boiler-app
+    container_name: boiler-app
+    environment:
+      COMPOSER_MEMORY_LIMIT: -1
+      APP_KEY: base64:UODntdo97DkjRqjCJHHZBhVLs0ZH7kQcyRjss/3CQ98=
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: boiler
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - boiler
+
+  db:
+    image: postgres:13
+    container_name: boiler-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: boiler
+      POSTGRES_PASSWORD: password
+      SERVICE_TAGS: dev
+      SERVICE_NAME: postgres
+    networks:
+      - boiler
+    volumes:
+      - boiler_dbdata:/var/lib/postgresql
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: boiler-nginx
+    container_name: boiler-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    networks:
+      - boiler
+
+networks:
+  boiler:
+    driver: bridge
+
+volumes:
+  boiler_dbdata:
+    driver: local
